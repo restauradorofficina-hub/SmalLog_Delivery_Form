@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SmalLog</title>
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,sans-serif;background:#f0f4f8;padding:16px;min-height:100vh}
+.card{background:#fff;border-radius:16px;padding:24px;max-width:440px;margin:0 auto;box-shadow:0 4px 20px rgba(0,0,0,.08)}
+.header{text-align:center;margin-bottom:24px}
+.header h1{color:#00BCD4;font-size:22px;font-weight:700}
+.header p{color:#888;font-size:13px;margin-top:6px;line-height:1.4}
+.campo{margin-bottom:16px}
+label{display:block;font-size:12px;font-weight:600;color:#555;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px}
+input{width:100%;padding:14px;border:1.5px solid #e0e0e0;border-radius:10px;font-size:16px;color:#333}
+input:focus{border-color:#00BCD4;outline:none}
+.req{color:#f44336;margin-left:2px}
+.btn{width:100%;padding:16px;background:#25D366;color:#fff;border:none;border-radius:12px;font-size:17px;font-weight:700;margin-top:8px;cursor:pointer}
+.aviso{text-align:center;color:#aaa;font-size:11px;margin-top:14px;line-height:1.5}
+hr{border:none;border-top:1px solid #f0f0f0;margin:20px 0}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+  <div class="header">
+    <h1>SmalLog</h1>
+    <p>Preencha os dados para confirmar<br>o endereço da sua entrega</p>
+  </div>
+
+  <div class="campo">
+    <label>Nome completo<span class="req">*</span></label>
+    <input type="text" id="nome">
+  </div>
+
+  <div class="campo">
+    <label>Endereço<span class="req">*</span></label>
+    <input type="text" id="endereco">
+  </div>
+
+  <div class="campo">
+    <label>Complemento</label>
+    <input type="text" id="complemento">
+  </div>
+
+  <div class="campo">
+    <label>CEP<span class="req">*</span></label>
+    <input type="tel" id="cep" maxlength="9">
+  </div>
+
+  <div class="campo">
+    <label>Cidade / Estado<span class="req">*</span></label>
+    <input type="text" id="cidade">
+  </div>
+
+  <hr>
+
+  <button class="btn" onclick="enviar()">Enviar pelo WhatsApp</button>
+
+  <p class="aviso">
+    Seus dados serão utilizados exclusivamente para confirmação da entrega.
+    Em caso de dúvidas, entre em contato:
+    <a href="mailto:smallog.app@gmail.com">smallog.app@gmail.com</a>
+  </p>
+</div>
+
+<script>
+function enviar() {
+  const nome = document.getElementById('nome').value;
+  const endereco = document.getElementById('endereco').value;
+  const complemento = document.getElementById('complemento').value;
+  const cep = document.getElementById('cep').value;
+  const cidade = document.getElementById('cidade').value;
+
+  if (!nome || !endereco || !cep || !cidade) {
+    alert('Preencha todos os campos obrigatórios');
+    return;
+  }
+
+  const params = new URLSearchParams(window.location.search);
+  const tel = params.get('tel') || '5500000000000';
+
+  const msg =
+`📦 Confirmação de Entrega SmalLog
+
+Nome: ${nome}
+Endereço: ${endereco}
+Complemento: ${complemento}
+CEP: ${cep}
+Cidade/UF: ${cidade}`;
+
+  window.open('https://wa.me/' + tel + '?text=' + encodeURIComponent(msg), '_blank');
+}
+</script>
+
+</body>
+</html>
