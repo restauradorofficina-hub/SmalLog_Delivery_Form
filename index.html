@@ -2,108 +2,197 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SmalLog</title>
-
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
+<title>SmalLog — Confirmar Entrega</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,sans-serif;background:#f0f4f8;padding:16px;min-height:100vh}
-.card{background:#fff;border-radius:16px;padding:24px;max-width:440px;margin:0 auto;box-shadow:0 4px 20px rgba(0,0,0,.08)}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+     background:#f0f4f8;padding:16px;min-height:100vh}
+.card{background:#fff;border-radius:16px;padding:24px;
+      max-width:440px;margin:0 auto;
+      box-shadow:0 4px 20px rgba(0,0,0,.08)}
 .header{text-align:center;margin-bottom:24px}
-.header h1{color:#00BCD4;font-size:22px;font-weight:700}
-.header p{color:#888;font-size:13px;margin-top:6px;line-height:1.4}
-.campo{margin-bottom:16px}
-label{display:block;font-size:12px;font-weight:600;color:#555;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px}
-input{width:100%;padding:14px;border:1.5px solid #e0e0e0;border-radius:10px;font-size:16px;color:#333}
-input:focus{border-color:#00BCD4;outline:none}
+.header h1{color:#00BCD4;font-size:24px;font-weight:700;letter-spacing:-0.5px}
+.header p{color:#888;font-size:13px;margin-top:6px;line-height:1.5}
+.secao{background:#f8f9fa;border-radius:10px;padding:14px;
+       margin-bottom:20px;border-left:3px solid #00BCD4}
+.secao-titulo{font-size:12px;font-weight:700;color:#00BCD4;
+              text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
+.campo{margin-bottom:14px}
+label{display:block;font-size:12px;font-weight:600;color:#555;
+      margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px}
+input{width:100%;padding:13px;border:1.5px solid #e0e0e0;
+      border-radius:10px;font-size:16px;color:#333;
+      transition:border-color .2s;-webkit-appearance:none}
+input:focus{border-color:#00BCD4;outline:none;
+            box-shadow:0 0 0 3px rgba(0,188,212,.1)}
+input::placeholder{color:#bbb;font-size:14px}
 .req{color:#f44336;margin-left:2px}
-.btn{width:100%;padding:16px;background:#25D366;color:#fff;border:none;border-radius:12px;font-size:17px;font-weight:700;margin-top:8px;cursor:pointer}
-.aviso{text-align:center;color:#aaa;font-size:11px;margin-top:14px;line-height:1.5}
-hr{border:none;border-top:1px solid #f0f0f0;margin:20px 0}
+.btn-add{width:100%;padding:12px;background:#f0f9ff;color:#00BCD4;
+         border:1.5px dashed #00BCD4;border-radius:10px;
+         font-size:14px;font-weight:600;cursor:pointer;margin-top:4px}
+.btn-add:active{background:#e0f5fb}
+.btn-remove{background:none;border:none;color:#f44336;
+            cursor:pointer;font-size:18px;padding:4px 8px;
+            float:right;margin-top:-4px}
+.btn-enviar{width:100%;padding:16px;background:#25D366;color:#fff;
+            border:none;border-radius:12px;font-size:17px;
+            font-weight:700;margin-top:8px;cursor:pointer;
+            display:flex;align-items:center;justify-content:center;gap:8px}
+.btn-enviar:active{background:#1da851;transform:scale(.98)}
+.aviso{text-align:center;color:#aaa;font-size:11px;
+       margin-top:14px;line-height:1.6}
+.aviso a{color:#00BCD4;text-decoration:none}
+hr{border:none;border-top:1px solid #eee;margin:20px 0}
+.num{display:inline-flex;align-items:center;justify-content:center;
+     width:22px;height:22px;background:#00BCD4;color:#fff;
+     border-radius:50%;font-size:12px;font-weight:700;margin-right:6px}
+.entrega-header{display:flex;align-items:center;
+                margin-bottom:12px;font-weight:600;color:#333}
 </style>
 </head>
-
 <body>
-
 <div class="card">
   <div class="header">
-    <h1>SmalLog</h1>
-    <p>Preencha os dados para confirmar<br>o endereço da sua entrega</p>
+    <h1>📦 SmalLog</h1>
+    <p>Preencha os dados abaixo para confirmar<br>o endereço da sua entrega</p>
   </div>
 
-  <div class="campo">
-    <label>Nome completo<span class="req">*</span></label>
-    <input type="text" id="nome">
-  </div>
+  <div id="entregas"></div>
 
-  <div class="campo">
-    <label>Endereço<span class="req">*</span></label>
-    <input type="text" id="endereco">
-  </div>
-
-  <div class="campo">
-    <label>Complemento</label>
-    <input type="text" id="complemento">
-  </div>
-
-  <div class="campo">
-    <label>CEP<span class="req">*</span></label>
-    <input type="tel" id="cep" maxlength="9">
-  </div>
-
-  <div class="campo">
-    <label>Cidade / Estado<span class="req">*</span></label>
-    <input type="text" id="cidade">
-  </div>
+  <button class="btn-add" onclick="adicionarEntrega()">
+    + Adicionar outro endereço de entrega
+  </button>
 
   <hr>
 
-  <button class="btn" onclick="enviar()">Enviar pelo WhatsApp</button>
+  <button class="btn-enviar" onclick="enviar()">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
+      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413z"/>
+    </svg>
+    Enviar pelo WhatsApp
+  </button>
 
   <p class="aviso">
-    Seus dados serão utilizados exclusivamente para confirmação da entrega.
-    Em caso de dúvidas, entre em contato:
-    <a href="mailto:smallog.app@gmail.com">smallog.app@gmail.com</a>
+    Seus dados serão enviados diretamente ao entregador.<br>
+    Dúvidas: <a href="mailto:smallog.app@gmail.com">smallog.app@gmail.com</a>
   </p>
 </div>
 
 <script>
-  const params = new URLSearchParams(window.location.search);
-  const telefone = params.get("tel") || "5500000000000";
-  
-function enviar() {
-  const nome = document.getElementById('nome').value;
-  const endereco = document.getElementById('endereco').value;
-  const complemento = document.getElementById('complemento').value;
-  const cep = document.getElementById('cep').value;
-  const cidade = document.getElementById('cidade').value;
+var telefone = new URLSearchParams(window.location.search).get('tel') || '5500000000000';
+var contador = 0;
 
-  if (!nome || !endereco || !cep || !cidade) {
-    alert('Preencha todos os campos obrigatórios');
+function adicionarEntrega() {
+  contador++;
+  var div = document.createElement('div');
+  div.className = 'secao';
+  div.id = 'entrega_' + contador;
+
+  var removeBtn = contador > 1
+    ? '<button class="btn-remove" onclick="removerEntrega(' + contador + ')" title="Remover">✕</button>'
+    : '';
+
+  div.innerHTML =
+    '<div class="entrega-header">' +
+      '<span class="num">' + contador + '</span> Destinatário' + removeBtn +
+    '</div>' +
+    '<div class="campo">' +
+      '<label>Nome completo<span class="req">*</span></label>' +
+      '<input type="text" id="nome_'+contador+'" placeholder="Ex: João da Silva" autocomplete="name" autocapitalize="words">' +
+    '</div>' +
+    '<div class="campo">' +
+      '<label>Endereço<span class="req">*</span></label>' +
+      '<input type="text" id="end_'+contador+'" placeholder="Rua, número, bairro" autocomplete="street-address">' +
+    '</div>' +
+    '<div class="campo">' +
+      '<label>Complemento</label>' +
+      '<input type="text" id="comp_'+contador+'" placeholder="Apto, bloco, referência (opcional)">' +
+    '</div>' +
+    '<div class="campo">' +
+      '<label>CEP<span class="req">*</span></label>' +
+      '<input type="tel" id="cep_'+contador+'" placeholder="00000-000" maxlength="9" inputmode="numeric" oninput="fmtCep(this)">' +
+    '</div>' +
+    '<div class="campo">' +
+      '<label>Cidade / Estado<span class="req">*</span></label>' +
+      '<input type="text" id="cid_'+contador+'" placeholder="Ex: São José do Rio Preto - SP">' +
+    '</div>';
+
+  document.getElementById('entregas').appendChild(div);
+}
+
+function removerEntrega(n) {
+  var el = document.getElementById('entrega_' + n);
+  if (el) el.remove();
+  // Renumera visualmente
+  var secoes = document.querySelectorAll('.secao');
+  secoes.forEach(function(s, i) {
+    var num = s.querySelector('.num');
+    if (num) num.textContent = (i + 1);
+  });
+}
+
+function fmtCep(input) {
+  var v = input.value.replace(/\D/g, '');
+  if (v.length > 5) v = v.slice(0, 5) + '-' + v.slice(5, 8);
+  input.value = v;
+}
+
+function val(id) {
+  var el = document.getElementById(id);
+  return el ? el.value.trim() : '';
+}
+
+function enviar() {
+  var secoes = document.querySelectorAll('.secao');
+  if (secoes.length === 0) {
+    alert('Adicione pelo menos um destinatário');
     return;
   }
 
-  const params = new URLSearchParams(window.location.search);
-  const tel = params.get('tel') || '5500000000000';
+  var msgs = [];
+  var ok = true;
 
-  const msg =
- `📦 *Solicitação de Coleta - SmalLog*
+  secoes.forEach(function(s, i) {
+    var n = s.id.replace('entrega_', '');
+    var nome = val('nome_' + n);
+    var end  = val('end_' + n);
+    var comp = val('comp_' + n);
+    var cep  = val('cep_' + n);
+    var cid  = val('cid_' + n);
 
- Olá! Estou confirmando os dados para coleta:
+    if (!nome || !end || !cep || !cid) {
+      alert('Preencha todos os campos obrigatórios do destinatário ' + (i + 1));
+      ok = false;
+      return;
+    }
+    if (cep.replace('-', '').length < 8) {
+      alert('CEP inválido no destinatário ' + (i + 1));
+      ok = false;
+      return;
+    }
 
-Nome: ${nome}
-Endereço: ${endereco}
-Complemento: ${complemento}
-CEP: ${cep}
-Cidade/UF: ${cidade}`;
+    msgs.push(
+      (secoes.length > 1 ? '--- Entrega ' + (i + 1) + ' ---\n' : '') +
+      'Nome: ' + nome + '\n' +
+      'Endereço: ' + end + '\n' +
+      (comp ? 'Complemento: ' + comp + '\n' : '') +
+      'CEP: ' + cep + '\n' +
+      'Cidade: ' + cid
+    );
+  });
 
-"Aguardamos a coleta.`;
+  if (!ok) return;
 
-  
+  var msg = '📦 *Dados de Entrega — SmalLog*\n\n' +
+    msgs.join('\n\n') +
+    '\n\n_Enviado via SmalLog_';
 
-  window.open('https://wa.me/' + tel + '?text=' + encodeURIComponent(msg), '_blank');
+  window.open('https://wa.me/' + telefone + '?text=' + encodeURIComponent(msg), '_blank');
 }
-</script>
 
+// Inicia com 1 entrega
+adicionarEntrega();
+</script>
 </body>
 </html>
