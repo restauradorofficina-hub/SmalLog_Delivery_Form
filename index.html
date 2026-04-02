@@ -16,8 +16,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
 .header p{color:#888;font-size:13px;margin-top:6px;line-height:1.5}
 .secao{background:#f8f9fa;border-radius:10px;padding:14px;
        margin-bottom:20px;border-left:3px solid #00BCD4}
-.secao-titulo{font-size:12px;font-weight:700;color:#00BCD4;
-              text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
 .campo{margin-bottom:14px}
 label{display:block;font-size:12px;font-weight:600;color:#555;
       margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px}
@@ -124,7 +122,6 @@ function adicionarEntrega() {
 function removerEntrega(n) {
   var el = document.getElementById('entrega_' + n);
   if (el) el.remove();
-  // Renumera visualmente
   var secoes = document.querySelectorAll('.secao');
   secoes.forEach(function(s, i) {
     var num = s.querySelector('.num');
@@ -143,6 +140,16 @@ function val(id) {
   return el ? el.value.trim() : '';
 }
 
+function gerarLinkSmalLog(nome, end, comp, cep, cid) {
+  // Gera deep link smallog:// para abrir direto no app
+  var params = 'nome=' + encodeURIComponent(nome)
+    + '&endereco=' + encodeURIComponent(end)
+    + '&cep=' + encodeURIComponent(cep.replace('-', ''))
+    + '&cidade=' + encodeURIComponent(cid)
+    + (comp ? '&complemento=' + encodeURIComponent(comp) : '');
+  return 'smallog://entrega?' + params;
+}
+
 function enviar() {
   var secoes = document.querySelectorAll('.secao');
   if (secoes.length === 0) {
@@ -151,6 +158,7 @@ function enviar() {
   }
 
   var msgs = [];
+  var links = [];
   var ok = true;
 
   secoes.forEach(function(s, i) {
@@ -172,13 +180,16 @@ function enviar() {
       return;
     }
 
+    var link = gerarLinkSmalLog(nome, end, comp, cep, cid);
+
     msgs.push(
       (secoes.length > 1 ? '--- Entrega ' + (i + 1) + ' ---\n' : '') +
       'Nome: ' + nome + '\n' +
       'Endereço: ' + end + '\n' +
       (comp ? 'Complemento: ' + comp + '\n' : '') +
       'CEP: ' + cep + '\n' +
-      'Cidade: ' + cid
+      'Cidade: ' + cid + '\n' +
+      '👉 Abrir no SmalLog: ' + link
     );
   });
 
