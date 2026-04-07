@@ -198,12 +198,14 @@ function adicionarEntrega() {
     '<div class="entrega-header"><span class="num">'+contador+'</span> Destinatário'+removeBtn+'</div>'+
     '<div class="campo"><label>Nome completo<span class="req">*</span></label>'+
     '<input type="text" id="nome_'+contador+'" placeholder="Ex: João da Silva" autocapitalize="words"></div>'+
-    '<div class="campo"><label>Endereço<span class="req">*</span></label>'+
-    '<input type="text" id="end_'+contador+'" placeholder="Rua, número, bairro"></div>'+
+    '<div class="campo"><label>Logradouro<span class="req">*</span></label>'+
+    '<input type="text" id="end_'+contador+'" placeholder="Ex: Rua das Flores"></div>'+
+    '<div class="campo"><label>Número<span class="req">*</span></label>'+
+    '<input type="text" id="num_'+contador+'" placeholder="Ex: 123, S/N"></div>'+
     '<div class="campo"><label>Complemento</label>'+
     '<input type="text" id="comp_'+contador+'" placeholder="Apto, bloco (opcional)"></div>'+
     '<div class="campo"><label>CEP<span class="req">*</span></label>'+
-    '<input type="tel" id="cep_'+contador+'" placeholder="00000-000" maxlength="9" inputmode="numeric" oninput="fmtCep(this)"></div>'+
+    '<input type="tel" id="cep_'+contador+'" placeholder="00000-000" maxlength="9" inputmode="numeric" oninput="fmtCepBusca(this,'+contador+')"></div>'+
     '<div class="campo"><label>Cidade / Estado<span class="req">*</span></label>'+
     '<input type="text" id="cid_'+contador+'" placeholder="Ex: São José do Rio Preto - SP"></div>';
   document.getElementById('entregas').appendChild(div);
@@ -222,6 +224,29 @@ function fmtCep(input) {
   var v = input.value.replace(/\D/g, '');
   if (v.length > 5) v = v.slice(0, 5) + '-' + v.slice(5, 8);
   input.value = v;
+}
+
+function fmtCepBusca(input, n) {
+  var v = input.value.replace(/\D/g, '');
+  if (v.length > 5) v = v.slice(0, 5) + '-' + v.slice(5, 8);
+  input.value = v;
+  if (v.replace('-','').length === 8) buscarEnderecoPorCep(v.replace('-',''), n);
+}
+
+function buscarEnderecoPorCep(cep, n) {
+  fetch('https://viacep.com.br/ws/'+cep+'/json/')
+    .then(function(r){ return r.json(); })
+    .then(function(d) {
+      if (!d.erro) {
+        var logr = (d.logradouro || '') + (d.bairro ? ', '+d.bairro : '');
+        var cid  = (d.localidade || '') + (d.uf ? ' - '+d.uf : '');
+        var endEl = document.getElementById('end_'+n);
+        var cidEl = document.getElementById('cid_'+n);
+        if (endEl && logr) endEl.value = logr;
+        if (cidEl && cid)  cidEl.value = cid;
+      }
+    })
+    .catch(function(){});
 }
 
 function val(id) {
@@ -358,9 +383,10 @@ function enviar() {
 
     secoes.forEach(function(s, i) {
       var n = s.id.replace('entrega_','');
-      var nome=val('nome_'+n), end=val('end_'+n), comp=val('comp_'+n),
-          cep=val('cep_'+n), cid=val('cid_'+n);
-      if (!nome||!end||!cep||!cid) {
+      var nome=val('nome_'+n), logr=val('end_'+n), num=val('num_'+n),
+          comp=val('comp_'+n), cep=val('cep_'+n), cid=val('cid_'+n);
+      var end = logr + (num ? ', '+num : '');
+      if (!nome||!logr||!num||!cep||!cid) {
         alert('Preencha todos os campos do destinatário '+(i+1)); ok=false; return;
       }
       if (cep.replace('-','').length < 8) {
