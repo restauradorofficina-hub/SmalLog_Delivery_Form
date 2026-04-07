@@ -139,6 +139,11 @@ hr{border:none;border-top:1px solid #eee;margin:20px 0}
           <td style="padding:3px 6px;color:#888">opcional</td>
           <td style="padding:3px 6px;color:#666">Número da nota fiscal</td>
         </tr>
+        <tr>
+          <td style="padding:3px 6px;color:#333;font-weight:600">observacoes</td>
+          <td style="padding:3px 6px;color:#888">opcional</td>
+          <td style="padding:3px 6px;color:#666">Instruções especiais</td>
+        </tr>
       </table>
       <p style="font-size:11px;color:#888;margin-top:8px">
         💡 Separador: vírgula (,) ou ponto-vírgula (;) — ambos aceitos
@@ -198,16 +203,18 @@ function adicionarEntrega() {
     '<div class="entrega-header"><span class="num">'+contador+'</span> Destinatário'+removeBtn+'</div>'+
     '<div class="campo"><label>Nome completo<span class="req">*</span></label>'+
     '<input type="text" id="nome_'+contador+'" placeholder="Ex: João da Silva" autocapitalize="words"></div>'+
+    '<div class="campo"><label>CEP<span class="req">*</span></label>'+
+    '<input type="tel" id="cep_'+contador+'" placeholder="00000-000" maxlength="9" inputmode="numeric" oninput="fmtCepBusca(this,'+contador+')"></div>'+
     '<div class="campo"><label>Logradouro<span class="req">*</span></label>'+
-    '<input type="text" id="end_'+contador+'" placeholder="Ex: Rua das Flores"></div>'+
+    '<input type="text" id="end_'+contador+'" placeholder="Preenchido automaticamente pelo CEP"></div>'+
     '<div class="campo"><label>Número<span class="req">*</span></label>'+
     '<input type="text" id="num_'+contador+'" placeholder="Ex: 123, S/N"></div>'+
     '<div class="campo"><label>Complemento</label>'+
     '<input type="text" id="comp_'+contador+'" placeholder="Apto, bloco (opcional)"></div>'+
-    '<div class="campo"><label>CEP<span class="req">*</span></label>'+
-    '<input type="tel" id="cep_'+contador+'" placeholder="00000-000" maxlength="9" inputmode="numeric" oninput="fmtCepBusca(this,'+contador+')"></div>'+
     '<div class="campo"><label>Cidade / Estado<span class="req">*</span></label>'+
-    '<input type="text" id="cid_'+contador+'" placeholder="Ex: São José do Rio Preto - SP"></div>';
+    '<input type="text" id="cid_'+contador+'" placeholder="Preenchido automaticamente pelo CEP"></div>'+
+    '<div class="campo"><label>Observações</label>'+
+    '<textarea id="obs_'+contador+'" placeholder="Ex: Ligar antes, receber R$ 50, entregar às 18h..." rows="2" style="width:100%;padding:13px;border:1.5px solid #e0e0e0;border-radius:10px;font-size:15px;color:#333;resize:none;font-family:inherit"></textarea></div>';
   document.getElementById('entregas').appendChild(div);
 }
 
@@ -294,6 +301,7 @@ function parsearCSV(texto) {
   }
 
   var iNome = col(['nome','destinatario','cliente','receptor']);
+  var iObs  = col(['observacoes','obs','observacao','instrucoes','instrucao','notas']);
   var iEnd  = col(['endereco','end','logradouro','rua','address']);
   var iComp = col(['complemento','comp','apto','apartamento']);
   var iCep  = col(['cep','codigopostal','zipcode','zip']);
@@ -321,7 +329,8 @@ function parsearCSV(texto) {
       complemento: iComp >= 0 ? cols[iComp] : '',
       cep: cep,
       cidade: cidade,
-      nf: iNf >= 0 ? cols[iNf] : ''
+      nf: iNf >= 0 ? cols[iNf] : '',
+      obs: iObs >= 0 ? cols[iObs] : ''
     });
   }
   return resultado;
@@ -350,9 +359,9 @@ function mostrarPreviewCSV() {
 }
 
 function baixarModelo() {
-  var csv = 'nome;endereco;complemento;cep;cidade;uf;nf\n' +
-    'João Silva;Rua das Flores 123;Apto 4;15030-200;São José do Rio Preto;SP;4001\n' +
-    'Maria Santos;Av. Brasil 456;;88809-320;Criciúma;SC;4002\n';
+  var csv = 'nome;endereco;numero;complemento;cep;cidade;uf;nf;observacoes\n' +
+    'João Silva;Rua das Flores;123;Apto 4;15030-200;São José do Rio Preto;SP;4001;Ligar antes\n' +
+    'Maria Santos;Av. Brasil;456;;88809-320;Criciúma;SC;4002;\n';
   var blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
   var url = URL.createObjectURL(blob);
   var a = document.createElement('a');
@@ -392,9 +401,11 @@ function enviar() {
       if (cep.replace('-','').length < 8) {
         alert('CEP inválido no destinatário '+(i+1)); ok=false; return;
       }
+      var obs = val('obs_'+n);
       msgs.push((secoes.length>1?'--- Entrega '+(i+1)+' ---\n':'')+
         'Nome: '+nome+'\nEndereço: '+end+'\n'+(comp?'Complemento: '+comp+'\n':'')+
-        'CEP: '+cep+'\nCidade: '+cid+'\n👉 '+gerarLink(nome,end,comp,cep,cid));
+        'CEP: '+cep+'\nCidade: '+cid+'\n'+(obs?'Observações: '+obs+'\n':'')+
+        '👉 '+gerarLink(nome,end,comp,cep,cid));
     });
 
   } else {
@@ -404,6 +415,7 @@ function enviar() {
       msgs.push((entregasCSV.length>1?'--- Entrega '+(i+1)+' ---\n':'')+
         'Nome: '+e.nome+'\nEndereço: '+e.endereco+'\n'+(e.complemento?'Complemento: '+e.complemento+'\n':'')+
         'CEP: '+e.cep+'\nCidade: '+e.cidade+'\n'+(e.nf?'NF: '+e.nf+'\n':'')+
+        (e.obs?'Observações: '+e.obs+'\n':'')+
         '👉 '+gerarLink(e.nome,e.endereco,e.complemento,e.cep,e.cidade));
     });
   }
